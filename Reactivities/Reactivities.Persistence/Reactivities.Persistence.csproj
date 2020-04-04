@@ -8,4 +8,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Reactivities.Domain\Reactivities.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
