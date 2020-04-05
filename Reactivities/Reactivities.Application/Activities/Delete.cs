@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Reactivities.Application.Errors;
-using Reactivities.Domain;
 using Reactivities.Persistence;
 using System;
 using System.Net;
@@ -9,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Reactivities.Application.Activities
 {
-    public class Details
+    public class Delete
     {
-        public class Query : IRequest<Activity>
+        public class Command : IRequest
         {
             public Guid Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, Activity>
+        public class Handler : IRequestHandler<Command>
         {
             private readonly DataContext _context;
 
@@ -24,14 +23,20 @@ namespace Reactivities.Application.Activities
             {
                 _context = context;
             }
-            public async Task<Activity> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
                 var activity = await _context.Activities.FindAsync(request.Id);
 
                 if (activity == null)
                     throw new RestException(HttpStatusCode.NotFound, new { activity = "Not Found " });
 
-                return activity;
+                _context.Remove(activity);
+
+                var success = await _context.SaveChangesAsync() > 0;
+
+                if (success) return Unit.Value;
+
+                throw new Exception("Problem saving changes");
             }
         }
     }
