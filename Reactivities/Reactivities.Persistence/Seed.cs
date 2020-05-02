@@ -1,14 +1,25 @@
-﻿using Reactivities.Domain;
+﻿using Microsoft.AspNetCore.Identity;
+using Reactivities.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Reactivities.Persistence
 {
     public class Seed
     {
-        public static void SeedData(DataContext context)
+        public static async Task SeedData(DataContext context, UserManager<AppUser> userManager)
         {
+            if (!userManager.Users.Any())
+            {
+                var users = GetUsers();
+
+                foreach (var user in users)
+                {
+                    await userManager.CreateAsync(user, "Pa$$w0rd");
+                }
+            }
             if (!context.Activities.Any())
             {
                 var activities = GetActivities();
@@ -18,6 +29,27 @@ namespace Reactivities.Persistence
             }
         }
 
+        private static List<AppUser> GetUsers() => new List<AppUser>
+        {
+            new AppUser
+            {
+                DisplayName = "Bob",
+                UserName = "bob",
+                Email = "bob@test.com"
+            },
+            new AppUser
+            {
+                DisplayName = "Tob",
+                UserName = "tob",
+                Email = "tob@test.com"
+            },
+            new AppUser
+            {
+                DisplayName = "Jane",
+                UserName = "jane",
+                Email = "jane@test.com"
+            }
+        };
         private static List<Activity> GetActivities() => new List<Activity>
         {
             new Activity
