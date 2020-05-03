@@ -33,18 +33,21 @@ namespace Reactivities.Persistence
         {
             new AppUser
             {
+                Id="a",
                 DisplayName = "Bob",
                 UserName = "bob",
                 Email = "bob@test.com"
             },
             new AppUser
             {
-                DisplayName = "Tob",
-                UserName = "tob",
+                Id="c",
+                DisplayName = "Tom",
+                UserName = "tom",
                 Email = "tob@test.com"
             },
             new AppUser
             {
+                Id="b",
                 DisplayName = "Jane",
                 UserName = "jane",
                 Email = "jane@test.com"
@@ -57,45 +60,114 @@ namespace Reactivities.Persistence
                 Title = "Future Activity 1",
                 Date = DateTime.Now.AddMonths(-2),
                 Description = "Activity 2 months ago",
-                Category = "drinks",
+                Category = "Drinks",
                 City = "London",
-                Venue = "Pub"
+                Venue = "Pub",
+                UserActivities = new List<UserActivity>
+                {
+                    new UserActivity
+                    {
+                        AppUserId = "a",
+                        IsHost=true,
+                        DateJoined = DateTime.Now.AddMonths(-2)
+                    }
+                }
             },
             new Activity
             {
                 Title = "Past Activity 2",
                 Date = DateTime.Now.AddMonths(-1),
                 Description = "Activity 1 month ago",
-                Category = "culture",
-                City = "London",
-                Venue = "Louvre"
+                Category = "Culture",
+                City = "Paris",
+                Venue = "The Louvre",
+                UserActivities = new List<UserActivity>
+                {
+                    new UserActivity
+                    {
+                        AppUserId = "b",
+                        IsHost=true,
+                        DateJoined = DateTime.Now.AddMonths(-1)
+                    },
+                    new UserActivity
+                    {
+                        AppUserId = "a",
+                        IsHost=false,
+                        DateJoined = DateTime.Now.AddMonths(-1)
+                    }
+                }
             },
             new Activity
             {
                 Title = "Future Activity 1",
                 Date = DateTime.Now.AddMonths(1),
                 Description = "Activity 1 month in future",
-                Category = "culture",
+                Category = "Music",
                 City = "London",
-                Venue = "natural History Museum"
+                Venue = "Wembly Stadium",
+                UserActivities = new List<UserActivity>
+                {
+                    new UserActivity
+                    {
+                        AppUserId = "b",
+                        IsHost=true,
+                        DateJoined = DateTime.Now.AddMonths(1)
+                    },
+                    new UserActivity
+                    {
+                        AppUserId = "a",
+                        IsHost=false,
+                        DateJoined = DateTime.Now.AddMonths(1)
+                    }
+                }
             },
             new Activity
             {
                 Title = "Future Activity 2",
                 Date = DateTime.Now.AddMonths(2),
                 Description = "Activity 2 month in future",
-                Category = "music",
+                Category = "Food",
                 City = "London",
-                Venue = "02 Arena"
+                Venue = "02 Arena",
+                UserActivities = new List<UserActivity>
+                {
+                    new UserActivity
+                    {
+                        AppUserId = "c",
+                        IsHost=true,
+                        DateJoined = DateTime.Now.AddMonths(2)
+                    },
+                    new UserActivity
+                    {
+                        AppUserId = "b",
+                        IsHost=false,
+                        DateJoined = DateTime.Now.AddMonths(1)
+                    }
+                }
             },
             new Activity
             {
                 Title = "Future Activity 3",
                 Date = DateTime.Now.AddMonths(3),
                 Description = "Activity 3 month in future",
-                Category = "drinks",
+                Category = "Drinks",
                 City = "London",
-                Venue = "Another pub"
+                Venue = "Another pub",
+                UserActivities = new List<UserActivity>
+                {
+                    new UserActivity
+                    {
+                        AppUserId = "c",
+                        IsHost=true,
+                        DateJoined = DateTime.Now.AddMonths(3)
+                    },
+                    new UserActivity
+                    {
+                        AppUserId = "a",
+                        IsHost=false,
+                        DateJoined = DateTime.Now.AddMonths(2)
+                    }
+                }
             },
             new Activity
             {
@@ -104,7 +176,16 @@ namespace Reactivities.Persistence
                 Description = "Activity 4 month in future",
                 Category = "drinks",
                 City = "London",
-                Venue = "Yet another pub"
+                Venue = "Yet another pub",
+                UserActivities = new List<UserActivity>
+                {
+                    new UserActivity
+                    {
+                        AppUserId = "b",
+                        IsHost=true,
+                        DateJoined = DateTime.Now.AddMonths(4)
+                    }
+                }
             },
             new Activity
             {
@@ -113,7 +194,16 @@ namespace Reactivities.Persistence
                 Description = "Activity 5 month in future",
                 Category = "drinks",
                 City = "London",
-                Venue = "Just anhother pub"
+                Venue = "Just anhother pub",
+                UserActivities = new List<UserActivity>
+                {
+                    new UserActivity
+                    {
+                        AppUserId = "a",
+                        IsHost=true,
+                        DateJoined = DateTime.Now.AddMonths(5)
+                    }
+                }
             },
             new Activity
             {
@@ -122,7 +212,28 @@ namespace Reactivities.Persistence
                 Description = "Activity 6 month in future",
                 Category = "music",
                 City = "London",
-                Venue = "Roundhouse Camden"
+                Venue = "Roundhouse Camden",
+                UserActivities = new List<UserActivity>
+                {
+                    new UserActivity
+                    {
+                        AppUserId = "b",
+                        IsHost=true,
+                        DateJoined = DateTime.Now.AddMonths(6)
+                    },
+                    new UserActivity
+                    {
+                        AppUserId = "a",
+                        IsHost=false,
+                        DateJoined = DateTime.Now.AddMonths(6)
+                    },
+                    new UserActivity
+                    {
+                        AppUserId = "c",
+                        IsHost=false,
+                        DateJoined = DateTime.Now.AddMonths(6)
+                    }
+                }
             },
             new Activity
             {
@@ -131,7 +242,28 @@ namespace Reactivities.Persistence
                 Description = "Activity 7 month in future",
                 Category = "travel",
                 City = "London",
-                Venue = "Somewhere on the Thames"
+                Venue = "Somewhere on the Thames",
+                UserActivities = new List<UserActivity>
+                {
+                    new UserActivity
+                    {
+                        AppUserId = "a",
+                        IsHost=true,
+                        DateJoined = DateTime.Now.AddMonths(7)
+                    },
+                    new UserActivity
+                    {
+                        AppUserId = "b",
+                        IsHost=false,
+                        DateJoined = DateTime.Now.AddMonths(6)
+                    },
+                    new UserActivity
+                    {
+                        AppUserId = "c",
+                        IsHost=false,
+                        DateJoined = DateTime.Now.AddMonths(5)
+                    }
+                }
             },
             new Activity
             {
@@ -140,7 +272,28 @@ namespace Reactivities.Persistence
                 Description = "Activity 8 month in future",
                 Category = "film",
                 City = "London",
-                Venue = "Cinema"
+                Venue = "Cinema",
+                UserActivities = new List<UserActivity>
+                {
+                    new UserActivity
+                    {
+                        AppUserId = "c",
+                        IsHost=true,
+                        DateJoined = DateTime.Now.AddMonths(8)
+                    },
+                    new UserActivity
+                    {
+                        AppUserId = "a",
+                        IsHost=false,
+                        DateJoined = DateTime.Now.AddMonths(7)
+                    },
+                    new UserActivity
+                    {
+                        AppUserId = "b",
+                        IsHost=false,
+                        DateJoined = DateTime.Now.AddMonths(5)
+                    }
+                }
             }
         };
     }
