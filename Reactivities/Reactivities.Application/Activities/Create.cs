@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Reactivities.Application.Interfaces;
 using Reactivities.Domain;
 using Reactivities.Persistence;
 using System;
@@ -36,10 +38,12 @@ namespace Reactivities.Application.Activities
         public class Handler : IRequestHandler<Command>
         {
             private readonly DataContext _context;
+            private readonly IUserAccesssor _userAccessor;
 
-            public Handler(DataContext context)
+            public Handler(DataContext context, IUserAccesssor userAccessor)
             {
                 _context = context;
+                _userAccessor = userAccessor;
             }
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
@@ -56,6 +60,20 @@ namespace Reactivities.Application.Activities
                 };
 
                 _context.Activities.Add(activity);
+
+                var user = await _context.Users.SingleOrDefaultAsync(x =>
+                   x.UserName == _userAccessor.GetCurrentUserName());
+
+                var attendee = new UserActivity
+                {
+                    AppUser = user,
+                    Activity = activity,
+                    IsHost = true,
+                    DateJoined = DateTime.Now
+                };
+
+                _context.UserActivities.Add(attendee);
+
                 var succes = await _context.SaveChangesAsync() > 0;
 
                 if (succes) return Unit.Value;
