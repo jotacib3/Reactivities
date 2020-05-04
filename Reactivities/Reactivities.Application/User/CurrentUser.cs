@@ -4,6 +4,7 @@ using Reactivities.Application.Interfaces;
 using Reactivities.Domain;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ namespace Reactivities.Application.User
                     DisplayName = user.DisplayName,
                     UserName = user.UserName,
                     Token = _jwtGeneretaor.CreateToken(user),
-                    Image = null
+                    Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
                 };
             }
         }

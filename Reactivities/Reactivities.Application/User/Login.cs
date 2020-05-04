@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Reactivities.Application.Errors;
 using Reactivities.Application.Interfaces;
 using Reactivities.Domain;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,7 +56,7 @@ namespace Reactivities.Application.User
                         DisplayName = user.DisplayName,
                         Token = _jwtGeneretaor.CreateToken(user),
                         UserName = user.UserName,
-                        Image = null
+                        Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
                     };
                 }
 
