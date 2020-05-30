@@ -12,6 +12,7 @@ namespace Reactivities.Domain
         public DateTime Date { get; set; }
         public string City { get; set; }
         public string Venue { get; set; }
-        public ICollection<UserActivity> UserActivities { get; set; }
+        public virtual ICollection<UserActivity> UserActivities { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
     }
 }

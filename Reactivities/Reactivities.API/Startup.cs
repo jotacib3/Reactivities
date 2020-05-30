@@ -20,6 +20,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using AutoMapper;
 using Reactivities.Infraestructure.Photos;
+using Reactivities.API.SignalR;
+using System.Threading.Tasks;
+using Reactivities.Application.Profiles;
 
 namespace Reactivities.API
 {
@@ -37,17 +40,20 @@ namespace Reactivities.API
         {
             services.AddDbContext<DataContext>(opt =>
             {
+                opt.UseLazyLoadingProxies();
                 opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
             services.AddCors(opt =>
             {
                 opt.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000")
+                        .AllowCredentials();
                 });
             });
             services.AddMediatR(typeof(List.Handler).Assembly);
             services.AddAutoMapper(typeof(List.Handler));
+            services.AddSignalR();
             services.AddMvc(opt =>
             {
                 var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
@@ -83,10 +89,25 @@ namespace Reactivities.API
                         ValidateAudience = false,
                         ValidateIssuer = false
                     };
+                    opt.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["acces_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if(!string.IsNullOrEmpty(accessToken)
+                                && (path.StartsWithSegments("chat")))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IUserAccesssor, UserAccessor>();
-            services.AddScoped<IPhotoAccessor, PhotoCloudinaryAccessor>();
+            services.AddScoped<IPhotoAccessor, PhotoFileSystemAccessor>();
+            services.AddScoped<IProfileReader, ProfileReader>();
             services.Configure<CloudinarySettings>(Configuration.GetSection("Cloudinary"));
         }
 
@@ -107,6 +128,7 @@ namespace Reactivities.API
             //app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseCors("CorsPolicy");
+            app.UseSignalR(routes => { routes.MapHub<ChatHub>("/chat");});
             app.UseMvc();
         }
     }

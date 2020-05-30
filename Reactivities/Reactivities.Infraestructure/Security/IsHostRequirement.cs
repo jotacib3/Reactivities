@@ -34,8 +34,6 @@ namespace Reactivities.Infraestructure.Security
                 var activityId = Guid.Parse(authContext.RouteData.Values["id"].ToString());
 
                 var activity = _context.Activities
-                    .Include(x => x.UserActivities)
-                        .ThenInclude(x => x.AppUser)
                     .SingleOrDefaultAsync(x => x.Id == activityId).Result;
 
                 var host = activity.UserActivities.FirstOrDefault(x => x.IsHost);

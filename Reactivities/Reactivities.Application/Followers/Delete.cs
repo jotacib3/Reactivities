@@ -2,22 +2,22 @@
 using Microsoft.EntityFrameworkCore;
 using Reactivities.Application.Errors;
 using Reactivities.Application.Interfaces;
+using Reactivities.Domain;
 using Reactivities.Persistence;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Reactivities.Application.Photos
+namespace Reactivities.Application.Followers
 {
-    public class SetMain
+    public class Delete
     {
         public class Command : IRequest
         {
-            public string Id { get; set; }
+            public string UserName { get; set; }
         }
         public class Handler : IRequestHandler<Command>
         {
@@ -32,19 +32,22 @@ namespace Reactivities.Application.Photos
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
+                var observer = await _context.Users.SingleOrDefaultAsync(x =>
+                    x.UserName == _userAccessor.GetCurrentUserName());
 
-                var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName ==
-                    _userAccessor.GetCurrentUserName());
+                var target = await _context.Users.SingleOrDefaultAsync(x =>
+                   x.UserName == request.UserName);
 
-                var photo = user.Photos.FirstOrDefault(x => x.Id == request.Id);
+                if (target == null)
+                    throw new RestException(HttpStatusCode.NotFound, new { User = "Not found" });
 
-                if (photo == null)
-                    throw new RestException(HttpStatusCode.NotFound, new { Photo = "Not Found" });
+                var following = await _context.Followings.SingleOrDefaultAsync(x =>
+                    x.ObserverId == observer.Id && x.TargetId == target.Id);
 
-                var currentMain = user.Photos.FirstOrDefault(x => x.IsMain);
+                if (following == null)
+                    throw new RestException(HttpStatusCode.BadRequest, new { User = "You are not following this user" });
 
-                currentMain.IsMain = false;
-                photo.IsMain = true;
+                _context.Followings.Remove(following);
 
                 var succes = await _context.SaveChangesAsync() > 0;
 

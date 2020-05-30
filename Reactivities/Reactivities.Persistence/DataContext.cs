@@ -12,6 +12,8 @@ namespace Reactivities.Persistence
         public DbSet<Activity> Activities { get; set; }
         public DbSet<UserActivity> UserActivities { get; set; }
         public DbSet<Photo> Photos { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<UserFollowing> Followings { get; set; }        
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -36,6 +38,21 @@ namespace Reactivities.Persistence
                 .HasOne(a => a.Activity)
                 .WithMany(u => u.UserActivities)
                 .HasForeignKey(a => a.ActivityId);
+
+            builder.Entity<UserFollowing>(x =>
+            {
+                x.HasKey(uf => new { uf.ObserverId, uf.TargetId });
+
+                x.HasOne(o => o.Observer)
+                .WithMany(f => f.Followings)
+                .HasForeignKey(o => o.ObserverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                x.HasOne(o => o.Target)
+                .WithMany(f => f.Followers)
+                .HasForeignKey(o => o.TargetId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }

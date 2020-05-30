@@ -11,15 +11,9 @@ namespace Reactivities.Infraestructure.Photos
 {
     public class PhotoFileSystemAccessor : IPhotoAccessor
     {
-        private readonly IHostingEnvironment _host;
-
-        public PhotoFileSystemAccessor(IHostingEnvironment host)
-        {
-            _host = host;
-        }
         public PhotoUploadResult AddPhoto(IFormFile file)
         {
-            var uploadsFolderPath = Path.Combine(_host.WebRootPath, "Uploads");
+            var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads");
             if (!Directory.Exists(uploadsFolderPath))
                 Directory.CreateDirectory(uploadsFolderPath);
 

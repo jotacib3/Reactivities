@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Reactivities.Infraestructure\Reactivities.Infraestructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

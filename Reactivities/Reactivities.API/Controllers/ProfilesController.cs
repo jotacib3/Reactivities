@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Reactivities.Application.Profiles;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Reactivities.API.Controllers
@@ -13,7 +14,13 @@ namespace Reactivities.API.Controllers
             return await Mediator.Send(new Details.Query { UserName = username });
         }
 
-        [HttpPost]
+        [HttpGet("{username}/activities")]
+        public async Task<ActionResult<List<UserActivityDto>>> GetUserActivities(string username, string predicate)
+        {
+            return await Mediator.Send(new ListActivities.Query { UserName = username, Predicate = predicate });
+        }
+
+        [HttpPut]
         public async Task<ActionResult<Unit>> Edit(Edit.Command command)
         {
             return await Mediator.Send(command);

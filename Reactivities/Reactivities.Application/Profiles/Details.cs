@@ -17,30 +17,15 @@ namespace Reactivities.Application.Profiles
 
         public class Handler : IRequestHandler<Query, Profile>
         {
-            private readonly DataContext _context;
-            private readonly IMapper _mapper;
+            private readonly IProfileReader _profileReader;
 
-            public Handler(DataContext context, IMapper mapper)
+            public Handler(IProfileReader profileReader)
             {
-                _context = context;
-                _mapper = mapper;
+                _profileReader = profileReader;
             }
             public async Task<Profile> Handle(Query request, CancellationToken cancellationToken)
             {
-                var user = await _context.Users
-                    .Include(x => x.Photos)
-                    .SingleOrDefaultAsync(x => x.UserName == request.UserName);
-
-                //if (user == null)
-                //    throw new RestException(HttpStatusCode.NotFound, new { user = "Not Found " });
-
-                return new Profile
-                {
-                    DisplayName = user.DisplayName,
-                    UserName = user.UserName,
-                    Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
-                    Bio = user.Bio
-                };
+                return await _profileReader.ReadProfile(request.UserName);
             }
         }
     }
