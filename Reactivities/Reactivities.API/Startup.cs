@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,19 +9,15 @@ using Reactivities.API.Middleware;
 using Reactivities.Application.Activities;
 using Reactivities.Application.Interfaces;
 using Reactivities.Infraestructure.Security;
-using Reactivities.Domain;
 using Reactivities.Persistence;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using AutoMapper;
 using Reactivities.Infraestructure.Photos;
 using Reactivities.API.SignalR;
-using System.Threading.Tasks;
 using Reactivities.Application.Profiles;
+using Reactivities.API.Extensions;
 
 namespace Reactivities.API
 {
@@ -43,14 +38,7 @@ namespace Reactivities.API
                 opt.UseLazyLoadingProxies();
                 opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
-            services.AddCors(opt =>
-            {
-                opt.AddPolicy("CorsPolicy", policy =>
-                {
-                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000")
-                        .AllowCredentials();
-                });
-            });
+            services.ConfigureCors();
             services.AddMediatR(typeof(List.Handler).Assembly);
             services.AddAutoMapper(typeof(List.Handler));
             services.AddSignalR();
@@ -63,47 +51,14 @@ namespace Reactivities.API
                     cfg.RegisterValidatorsFromAssemblyContaining<Create>())
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            var builder = services.AddIdentityCore<AppUser>();
-            var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
-            identityBuilder.AddEntityFrameworkStores<DataContext>();
-            identityBuilder.AddSignInManager<SignInManager<AppUser>>();
 
-            services.AddAuthorization(opt =>
-            {
-                opt.AddPolicy("IsActivityHost", policy =>
-                {
-                    policy.Requirements.Add(new IsHostRequirement());
-                });
-            });
+            services.ConfigureIdentity();
+            services.ConfigureAuthorization();
 
             services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt =>
-                {
-                    opt.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = key,
-                        ValidateAudience = false,
-                        ValidateIssuer = false
-                    };
-                    opt.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = context =>
-                        {
-                            var accessToken = context.Request.Query["acces_token"];
-                            var path = context.HttpContext.Request.Path;
-                            if(!string.IsNullOrEmpty(accessToken)
-                                && (path.StartsWithSegments("chat")))
-                            {
-                                context.Token = accessToken;
-                            }
-                            return Task.CompletedTask;
-                        }
-                    };
-                });
+            services.ConfigureAuthentication(Configuration);
+
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IUserAccesssor, UserAccessor>();
             services.AddScoped<IPhotoAccessor, PhotoFileSystemAccessor>();
